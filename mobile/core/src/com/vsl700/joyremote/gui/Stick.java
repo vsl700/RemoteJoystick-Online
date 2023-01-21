@@ -11,11 +11,8 @@ public class Stick extends Button {
     Button sprint;
     Vector2 stickPos;
 
-    public Stick(Color color, GUIRenderer guiRenderer) {
+    public Stick(BitmapFont font, Color color, GUIRenderer guiRenderer) {
         super("", null, color, false, false, guiRenderer);
-
-        BitmapFont font = new BitmapFont();
-        font.setColor(color);
 
         sprint = new Button("Shift", font, color, false, false, guiRenderer);
         stickPos = new Vector2();
@@ -29,7 +26,6 @@ public class Stick extends Button {
 
         if(sprint.isTouched()){
             stickPos.set(x + width / 2, y + width);
-            multitouch = -1;
         }
         else if(isLocalTouched()){
             float tX = getTouchX(multitouch);

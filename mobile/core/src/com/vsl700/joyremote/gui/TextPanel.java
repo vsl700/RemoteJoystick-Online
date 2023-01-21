@@ -1,6 +1,7 @@
 package com.vsl700.joyremote.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
@@ -81,6 +82,9 @@ public class TextPanel extends Text implements InputProcessor {
 			active = true;
 
 			Gdx.input.setInputProcessor(this);
+			if(isNumeric())
+				Gdx.input.setOnscreenKeyboardVisible(true, Input.OnscreenKeyboardType.NumberPad);
+			else Gdx.input.setOnscreenKeyboardVisible(true);
 		}
 		else if(justTouchedOut()) {
 			deactive();
@@ -105,7 +109,7 @@ public class TextPanel extends Text implements InputProcessor {
 		shape.setColor(fR, fG, fB, fA);
 		
 		shape.setProjectionMatrix(guiRenderer.getCam().combined);
-		shape.begin(ShapeRenderer.ShapeType.Filled);
+		shape.begin(ShapeRenderer.ShapeType.Line); // TODO Make a check for an option for filling and not filling
 		shape.rect(x, y, width, height);
 
 		if (cursor) {
@@ -163,6 +167,7 @@ public class TextPanel extends Text implements InputProcessor {
 		if (active) {
 			active = false;
 			cursor = false;
+			Gdx.input.setOnscreenKeyboardVisible(false);
 
 			if ((min != 0 || max != 0) && (text.equals("") || Integer.decode(text) < min || Integer.decode(text) > max)) {
 				text = prevText.toString();
