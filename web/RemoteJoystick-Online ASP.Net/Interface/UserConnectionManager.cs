@@ -1,50 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 
 namespace RemoteJoystick_Online_ASP.Net.Interface
 {
     public class UserConnectionManager : IUserConnectionManager
     {
-        public static Dictionary<string, List<string>> connections = new Dictionary<string, List<string>();
+        public class DesktopMobilePair {
+            public string DesktopConnectionId { get; set; }
+            public string MobileConnectionId { get; set; }
+        }
 
-        public List<string> GetUserConnections(string connectionCode)
+        public static Dictionary<string, DesktopMobilePair> connections = new Dictionary<string, DesktopMobilePair>();
+
+        public string[] GetUserConnections(string connectionCode)
         {
             lock (connections)
             {
                 if (!connections.ContainsKey(connectionCode))
                     return null;
 
-                return connections[connectionCode];
+                var dmPair = connections[connectionCode];
+                return new string[]{ dmPair.DesktopConnectionId, dmPair.MobileConnectionId };
             }
         }
 
-        public void KeepUserConnection(string connectionCode, string connectionId)
+        public bool KeepUserConnection(string connectionCode, string connectionId)
         {
             lock (connections)
             {
-                if (!connections.ContainsKey(connectionCode))
-                    connections[connectionCode] = new List<string>();
+                bool isMobileBool = IsMobile(connectionCode);
+                connectionCode = GetNormalCode(connectionCode);
+                if (!connections.ContainsKey(connectionCode)) {
+                    if (!isMobileBool)
+                    {
+                        DesktopMobilePair dmPair = new DesktopMobilePair { DesktopConnectionId = connectionId };
+                        connections[connectionCode] = dmPair;
 
-                if (!connections[connectionCode].Contains(connectionId))
-                    connections[connectionCode].Add(connectionId);
+                        return true;
+                    }
+                }
+                else if(isMobileBool)
+                {
+                    connections[connectionCode].MobileConnectionId = connectionId;
+                    return true;
+                }
             }
+
+            return false;
         }
 
         public void RemoveUserConnection(string connectionId)
         {
             lock (connections)
             {
-                foreach(var connectionCode in connections.Keys)
+                foreach (var connectionCode in connections.Keys)
                 {
-                    if (connections[connectionCode].Contains(connectionId))
+                    bool isMobileBool = IsMobile(connectionCode);
+                    string tempCode = GetNormalCode(connectionCode);
+                    if (connections[tempCode].DesktopConnectionId == connectionId)
                     {
-                        connections[connectionCode].Remove(connectionId);
+                        connections[tempCode].DesktopConnectionId = null;
+                        break;
+                    }
+                    else if(connections[tempCode].MobileConnectionId == connectionId)
+                    {
+                        connections[tempCode].MobileConnectionId = null;
                         break;
                     }
                 }
             }
+        }
+
+        private bool IsMobile(string connectionCode)
+        {
+            return connectionCode.Last() == 'm';
+        }
+
+        private string GetNormalCode(string connectionCode)
+        {
+            return connectionCode.Substring(0, connectionCode.Length - 1);
         }
     }
 }
