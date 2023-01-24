@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RemoteJoystick_Online_ASP.Net.Hubs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,7 +8,7 @@ using System.Web.Http;
 
 namespace RemoteJoystick_Online_ASP.Net.Controllers
 {
-    public class ValuesController : ApiController
+    public class ValuesController : HubController<NotificationUserHub>
     {
         // GET api/values
         public IEnumerable<string> Get()

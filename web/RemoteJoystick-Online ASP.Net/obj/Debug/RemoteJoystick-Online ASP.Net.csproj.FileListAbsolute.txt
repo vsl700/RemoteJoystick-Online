@@ -82,3 +82,18 @@ D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.N
 D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\obj\Debug\RemoteJoystick-Online ASP.Net.csproj.CoreCompileInputs.cache
 D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\obj\Debug\RemoteJoystick-Online ASP.Net.dll
 D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\obj\Debug\RemoteJoystick-Online ASP.Net.pdb
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.Cors.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.Security.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Owin.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\System.Web.Cors.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\System.Web.Http.Cors.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\System.Web.Http.Owin.dll
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.AspNet.SignalR.Core.pdb
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.xml
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.Cors.xml
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\Microsoft.Owin.Security.xml
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\System.Web.Http.Cors.xml
+D:\Documents\Java Projects\RemoteJoystick-Online\web\RemoteJoystick-Online ASP.Net\bin\System.Web.Http.Owin.xml

@@ -7,7 +7,7 @@ namespace RemoteJoystick_Online_ASP.Net.Interface
 {
     public class UserConnectionManager : IUserConnectionManager
     {
-        public static Dictionary<string, List<string>> connections = new Dictionary<string, List<string>();
+        public static Dictionary<string, List<string>> connections = new Dictionary<string, List<string>>();
 
         public List<string> GetUserConnections(string connectionCode)
         {

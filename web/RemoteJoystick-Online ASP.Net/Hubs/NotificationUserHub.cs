@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using RemoteJoystick_Online_ASP.Net.Interface;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Web;
 
 namespace RemoteJoystick_Online_ASP.Net.Hubs
 {
+    [HubName("primaryHub")]
     public class NotificationUserHub : Hub
     {
         private readonly IUserConnectionManager _userConnectionManager;
