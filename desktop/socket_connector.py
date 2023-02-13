@@ -1,12 +1,11 @@
 import json
 from json import JSONDecodeError
+from math import sin, cos, sqrt
 from threading import Thread
 
 import pyautogui
-import websocket
 import requests
-
-from math import sin, cos, sqrt
+import websocket
 
 
 class Vector2:
@@ -27,7 +26,28 @@ class Vector2:
 pyautogui.FAILSAFE = False
 
 jsonObj = {}
-tickDuration = 0.01
+
+# Key bindings (values are according to the key names in pyautogui)
+up_binding = "w"
+left_binding = "a"
+down_binding = "s"
+right_binding = "d"
+shift_binding = ""
+btn_a_binding = ""
+btn_b_binding = "shiftleft"
+btn_c_binding = "space"
+btn_p_binding = "tab"
+btn_n_binding = "escape"
+
+# Key binary codes
+# (to allow to easily combine keys and then check if that combination is already pressed on update cycle)
+NONE = 0
+UP = 1
+LEFT = 1 << 1
+RIGHT = 1 << 2
+DOWN = 1 << 3
+current_keys = 0
+
 joy_vec = Vector2()
 # Support vectors
 primary_support_vecs = [Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0), Vector2(0, -1)]
@@ -35,51 +55,56 @@ secondary_support_vecs = [Vector2(cos(45), sin(45)), Vector2(cos(135), sin(135))
                           Vector2(cos(-45), sin(-45)), Vector2(cos(-135), sin(-135))]
 
 
-def on_error(ws, error):
-    print(error)
+def movement_key_press(key_code):
+    global current_keys
+    if key_code == current_keys:
+        return
 
+    print(key_code, bin(key_code))
 
-def on_close(ws, close_status_code, close_msg):
-    print("### closed ###")
-    print(close_status_code)
-    print(close_msg)
+    if key_code & UP:
+        if not current_keys & UP:
+            pyautogui.keyDown(up_binding)
+    elif current_keys & UP:
+        pyautogui.keyUp(up_binding)
 
+    if key_code & LEFT:
+        if not current_keys & LEFT:
+            pyautogui.keyDown(left_binding)
+    elif current_keys & LEFT:
+        pyautogui.keyUp(left_binding)
 
-def on_open(ws):
-    print("Opened connection")
+    if key_code & DOWN:
+        if not current_keys & DOWN:
+            pyautogui.keyDown(down_binding)
+    elif current_keys & DOWN:
+        pyautogui.keyUp(down_binding)
+
+    if key_code & RIGHT:
+        if not current_keys & RIGHT:
+            pyautogui.keyDown(right_binding)
+    elif current_keys & RIGHT:
+        pyautogui.keyUp(right_binding)
+
+    current_keys = key_code
 
 
 def processStickInput():
     while True:
         if joy_vec.x == 0 and joy_vec.y == 0:
-            pyautogui.keyUp("w")
-            pyautogui.keyUp("a")
-            pyautogui.keyUp("s")
-            pyautogui.keyUp("d")
+            movement_key_press(NONE)
             continue
         elif joy_vec.x == 1:
-            pyautogui.keyUp("w")
-            pyautogui.keyUp("a")
-            pyautogui.keyUp("s")
-            pyautogui.keyDown("d")
+            movement_key_press(RIGHT)
             continue
         elif joy_vec.y == 1:
-            pyautogui.keyDown("w")
-            pyautogui.keyUp("a")
-            pyautogui.keyUp("s")
-            pyautogui.keyUp("d")
+            movement_key_press(UP)
             continue
         elif joy_vec.x == -1:
-            pyautogui.keyUp("w")
-            pyautogui.keyDown("a")
-            pyautogui.keyUp("s")
-            pyautogui.keyUp("d")
+            movement_key_press(LEFT)
             continue
         elif joy_vec.y == -1:
-            pyautogui.keyUp("w")
-            pyautogui.keyUp("a")
-            pyautogui.keyDown("s")
-            pyautogui.keyUp("d")
+            movement_key_press(DOWN)
             continue
 
         vec_distances = {vec.distance(joy_vec): vec for vec in primary_support_vecs}
@@ -90,72 +115,38 @@ def processStickInput():
 
         primary_joy_distance = closest_primary_vec.distance(joy_vec)
         secondary_joy_distance = closest_secondary_vec.distance(joy_vec)
+
+        # Note - the secondary vectors are right in the middle between two axes (or primary vectors in this case)
         combine_dirs = secondary_joy_distance < primary_joy_distance
 
         if joy_vec.x > 0 and joy_vec.y > 0:  # Q1
             if combine_dirs:
-                pyautogui.keyDown("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyDown("d")
+                movement_key_press(UP | RIGHT)
             elif closest_primary_vec.x == 0 or closest_primary_vec.y == 1:
-                pyautogui.keyDown("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyUp("d")
+                movement_key_press(UP)
             else:
-                pyautogui.keyUp("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyDown("d")
+                movement_key_press(RIGHT)
         elif joy_vec.x < 0 and joy_vec.y > 0:  # Q2
             if combine_dirs:
-                pyautogui.keyDown("w")
-                pyautogui.keyDown("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyUp("d")
+                movement_key_press(UP | LEFT)
             elif closest_primary_vec.x == 0 or closest_primary_vec.y == 1:
-                pyautogui.keyDown("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyUp("d")
+                movement_key_press(UP)
             else:
-                pyautogui.keyUp("w")
-                pyautogui.keyDown("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyUp("d")
+                movement_key_press(LEFT)
         elif joy_vec.x < 0 and joy_vec.y < 0:  # Q3
             if combine_dirs:
-                pyautogui.keyUp("w")
-                pyautogui.keyDown("a")
-                pyautogui.keyDown("s")
-                pyautogui.keyUp("d")
+                movement_key_press(DOWN | LEFT)
             elif closest_primary_vec.x == 0 or closest_primary_vec.y == -1:
-                pyautogui.keyUp("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyDown("s")
-                pyautogui.keyUp("d")
+                movement_key_press(DOWN)
             else:
-                pyautogui.keyUp("w")
-                pyautogui.keyDown("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyUp("d")
+                movement_key_press(LEFT)
         elif joy_vec.x > 0 and joy_vec.y < 0:  # Q4
             if combine_dirs:
-                pyautogui.keyUp("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyDown("s")
-                pyautogui.keyDown("d")
+                movement_key_press(DOWN | RIGHT)
             elif closest_primary_vec.x == 0 or closest_primary_vec.y == -1:
-                pyautogui.keyUp("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyDown("s")
-                pyautogui.keyUp("d")
+                movement_key_press(DOWN)
             else:
-                pyautogui.keyUp("w")
-                pyautogui.keyUp("a")
-                pyautogui.keyUp("s")
-                pyautogui.keyDown("d")
+                movement_key_press(RIGHT)
 
 
 def processButtonInput():
@@ -173,27 +164,27 @@ def processButtonInput():
 
     if "btnB" in jsonObj:
         if jsonObj.get("btnB"):
-            pyautogui.keyDown("shiftleft")
+            pyautogui.keyDown(btn_b_binding)
         else:
-            pyautogui.keyUp("shiftleft")
+            pyautogui.keyUp(btn_b_binding)
 
     if "btnC" in jsonObj:
         if jsonObj.get("btnC"):
-            pyautogui.keyDown("space")
+            pyautogui.keyDown(btn_c_binding)
         else:
-            pyautogui.keyUp("space")
+            pyautogui.keyUp(btn_c_binding)
 
     if "btnP" in jsonObj:
         if jsonObj.get("btnP"):
-            pyautogui.keyDown("tab")
+            pyautogui.keyDown(btn_p_binding)
         else:
-            pyautogui.keyUp("tab")
+            pyautogui.keyUp(btn_p_binding)
 
     if "btnN" in jsonObj:
         if jsonObj.get("btnN"):
-            pyautogui.keyDown("escape")
+            pyautogui.keyDown(btn_n_binding)
         else:
-            pyautogui.keyUp("escape")
+            pyautogui.keyUp(btn_n_binding)
 
     if "joyX" in jsonObj:
         joy_vec.x = jsonObj.get("joyX")
