@@ -2,6 +2,7 @@ import json
 from json import JSONDecodeError
 from math import sin, cos, sqrt
 from threading import Thread
+from time import sleep
 
 import pyautogui
 import requests
@@ -147,6 +148,10 @@ def processStickInput():
                 movement_key_press(DOWN)
             else:
                 movement_key_press(RIGHT)
+
+        # Synchronizes the desktop with the mobile (as the mobile app runs with 60fps).
+        # That optimizes the desktop program's control over the PC
+        sleep(1/60)
 
 
 def processButtonInput():
